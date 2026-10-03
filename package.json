@@ -1,0 +1,77 @@
+{
+  "name": "unibits",
+  "version": "0.1.0",
+  "description": "Unified frontend build framework natively supporting Vue 3, React 18+ and Solid.js with a built-in component showcase.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "bin": {
+    "unibits": "bin/unibits.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "bin",
+    "dist",
+    "templates",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsx src/cli.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "unibits",
+    "vue",
+    "react",
+    "solid",
+    "bundler",
+    "build-tool",
+    "showcase",
+    "vite",
+    "components"
+  ],
+  "dependencies": {
+    "@babel/core": "^7.24.0",
+    "@babel/preset-typescript": "^7.24.0",
+    "@clack/prompts": "^0.7.0",
+    "@vue/compiler-sfc": "^3.4.21",
+    "babel-preset-solid": "^1.9.15",
+    "commander": "^12.0.0",
+    "esbuild": "^0.21.0",
+    "http-proxy-middleware": "^3.0.0",
+    "lightningcss": "^1.24.1",
+    "picocolors": "^1.0.0",
+    "shiki": "^1.2.0",
+    "ws": "^8.17.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.0",
+    "@types/ws": "^8.5.10",
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.5"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18",
+    "solid-js": ">=1.8",
+    "vue": ">=3.3"
+  },
+  "peerDependenciesMeta": {
+    "react": { "optional": true },
+    "react-dom": { "optional": true },
+    "solid-js": { "optional": true },
+    "vue": { "optional": true }
+  }
+}

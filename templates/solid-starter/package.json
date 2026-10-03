@@ -1,0 +1,16 @@
+{
+  "name": "solid-starter",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "unibits dev",
+    "build": "unibits build"
+  },
+  "dependencies": {
+    "solid-js": "^1.8.0"
+  },
+  "devDependencies": {
+    "unibits": "latest"
+  }
+}

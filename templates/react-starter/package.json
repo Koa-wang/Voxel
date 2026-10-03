@@ -1,0 +1,17 @@
+{
+  "name": "react-starter",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "unibits dev",
+    "build": "unibits build"
+  },
+  "dependencies": {
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
+  },
+  "devDependencies": {
+    "unibits": "latest"
+  }
+}

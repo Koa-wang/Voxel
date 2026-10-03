@@ -1,0 +1,16 @@
+{
+  "name": "vue-starter",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "unibits dev",
+    "build": "unibits build"
+  },
+  "dependencies": {
+    "vue": "^3.4.0"
+  },
+  "devDependencies": {
+    "unibits": "latest"
+  }
+}
