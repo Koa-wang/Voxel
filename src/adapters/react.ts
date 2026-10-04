@@ -25,7 +25,10 @@ export class ReactAdapter implements FrameworkAdapter {
     );
   }
 
-  getTransformPlugins(_config: import('../types.js').ResolvedConfig, _frameworks: import('../types.js').FrameworkName[]): TransformPlugin[] {
+  getTransformPlugins(
+    _config: import('../types.js').ResolvedConfig,
+    _frameworks: import('../types.js').FrameworkName[],
+  ): TransformPlugin[] {
     // esbuild handles .jsx/.tsx via its automatic JSX runtime; a dedicated
     // plugin is only needed for Fast Refresh registrations (see setupHMR).
     return [];
@@ -63,15 +66,12 @@ export class ReactAdapter implements FrameworkAdapter {
       },
       mount(el: HTMLElement, compiledCode: string, props: Record<string, unknown>): () => void {
         const sandbox = (globalThis as Record<string, unknown>).__unibits_sandbox as
-          | { mountReact(el: HTMLElement, code: string, props: unknown): () => void }
-          | undefined;
+          { mountReact(el: HTMLElement, code: string, props: unknown): () => void } | undefined;
         if (!sandbox?.mountReact) throw new Error('React sandbox runtime not initialized');
         return sandbox.mountReact(el, compiledCode, props);
       },
       unmount(): void {
-        const sandbox = (globalThis as Record<string, unknown>).__unibits_sandbox as
-          | { unmountAll(): void }
-          | undefined;
+        const sandbox = (globalThis as Record<string, unknown>).__unibits_sandbox as { unmountAll(): void } | undefined;
         sandbox?.unmountAll();
       },
     };

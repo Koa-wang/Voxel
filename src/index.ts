@@ -1,10 +1,4 @@
-import type {
-  CliOptions,
-  FrameworkName,
-  ResolvedConfig,
-  ShowcaseConfig,
-  UserConfig,
-} from './types.js';
+import type { CliOptions, FrameworkName, ResolvedConfig, ShowcaseConfig, UserConfig } from './types.js';
 import type { FrameworkAdapter } from './adapters/interface.js';
 import type { TransformPlugin, TransformResult, TransformArgs } from './adapters/transform.js';
 import type { Plugin, PluginContext, Asset } from './plugins/context.js';

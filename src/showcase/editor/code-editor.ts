@@ -23,7 +23,8 @@ export class CodeEditor {
     this.element.style.cssText = 'display:flex;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;height:100%';
 
     this.gutter = document.createElement('div');
-    this.gutter.style.cssText = 'padding:10px 8px;color:#7d8590;text-align:right;user-select:none;background:rgba(0,0,0,.15);overflow:hidden;min-width:2.5em';
+    this.gutter.style.cssText =
+      'padding:10px 8px;color:#7d8590;text-align:right;user-select:none;background:rgba(0,0,0,.15);overflow:hidden;min-width:2.5em';
     this.element.appendChild(this.gutter);
 
     this.textarea = document.createElement('textarea');

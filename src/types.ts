@@ -24,8 +24,7 @@ export interface AliasMap {
 }
 
 export type ProxyTarget =
-  | string
-  | { target: string; ws?: boolean; changeOrigin?: boolean; rewrite?: (path: string) => string };
+  string | { target: string; ws?: boolean; changeOrigin?: boolean; rewrite?: (path: string) => string };
 
 export interface ProxyConfig {
   [path: string]: ProxyTarget;
@@ -95,6 +94,19 @@ export interface UserConfig {
   cacheDir?: string;
   /** Watch additional dirs for HMR (used by monorepo linking) */
   watchDirs?: string[];
+  /**
+   * Enable HTTPS for the dev server.
+   * - `true` generates (and caches) a self-signed certificate.
+   * - `{ key, cert }` uses the given PEM file paths (relative to project root).
+   */
+  https?: boolean | { key: string; cert: string };
+  /** Automatically open the dev server / showcase in the browser. Default false */
+  open?: boolean;
+  /**
+   * Base public path the app is deployed under (e.g. '/docs/'). Applied to
+   * asset URLs in production builds and static showcase builds. Default '/'
+   */
+  base?: string;
 }
 
 export interface ResolvedConfig {
@@ -116,7 +128,10 @@ export interface ResolvedConfig {
   cacheDir: string;
   watchDirs: string[];
   host: string;
-  https: boolean;
+  https: boolean | { key: string; cert: string };
+  open: boolean;
+  /** Normalized base path: always starts and ends with '/'. */
+  base: string;
 }
 
 export interface CliOptions {
@@ -130,7 +145,7 @@ export interface CliOptions {
   analyze?: boolean;
   noCache?: boolean;
   host?: string;
-  https?: boolean;
+  https?: boolean | { key: string; cert: string };
   open?: boolean;
 }
 

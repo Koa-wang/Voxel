@@ -21,7 +21,9 @@ function fmtBytes(bytes: number): string {
  */
 export async function analyzeBundle(metafile: Metafile, config: ResolvedConfig): Promise<void> {
   const outputs = metafile.outputs;
-  const chunks: Row[] = Object.entries(outputs).map(([name, o]) => ({ name, bytes: o.bytes })).sort((a, b) => b.bytes - a.bytes);
+  const chunks: Row[] = Object.entries(outputs)
+    .map(([name, o]) => ({ name, bytes: o.bytes }))
+    .sort((a, b) => b.bytes - a.bytes);
   const total = chunks.reduce((sum, c) => sum + c.bytes, 0);
 
   // Duplicate dependency detection: an input appearing in more than one chunk.

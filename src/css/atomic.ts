@@ -27,12 +27,7 @@ async function exists(path: string): Promise<boolean> {
  * install command.
  */
 export async function detectAtomicCss(cwd: string): Promise<AtomicCssKind> {
-  const tailwindConfigs = [
-    'tailwind.config.js',
-    'tailwind.config.ts',
-    'tailwind.config.cjs',
-    'tailwind.config.mjs',
-  ];
+  const tailwindConfigs = ['tailwind.config.js', 'tailwind.config.ts', 'tailwind.config.cjs', 'tailwind.config.mjs'];
   const unoConfigs = ['uno.config.js', 'uno.config.ts', 'unocss.config.js', 'unocss.config.ts'];
 
   for (const name of tailwindConfigs) {
@@ -60,9 +55,7 @@ export async function createAtomicCssProcessor(cwd: string): Promise<AtomicCssPr
   if (!hasPostcss) {
     logger.warn(
       `Detected ${kind} config but 'postcss' is not installed. ` +
-        `Install it with: npm install -D postcss ${
-          kind === 'tailwind' ? '@tailwindcss/postcss' : '@unocss/postcss'
-        }`,
+        `Install it with: npm install -D postcss ${kind === 'tailwind' ? '@tailwindcss/postcss' : '@unocss/postcss'}`,
     );
     return { kind, active: false, process: async (c) => c };
   }
@@ -80,7 +73,9 @@ export async function createAtomicCssProcessor(cwd: string): Promise<AtomicCssPr
         },
       };
     } catch {
-      logger.warn('Detected tailwind config but @tailwindcss/postcss is missing. Run: npm install -D @tailwindcss/postcss');
+      logger.warn(
+        'Detected tailwind config but @tailwindcss/postcss is missing. Run: npm install -D @tailwindcss/postcss',
+      );
       return { kind, active: false, process: async (c) => c };
     }
   }

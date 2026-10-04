@@ -84,7 +84,10 @@ export async function detectWorkspace(cwd: string): Promise<WorkspaceInfo | null
         name: String(pkg.name),
         dir,
         pkg,
-        dependencies: { ...((pkg.dependencies as Record<string, string>) ?? {}), ...((pkg.devDependencies as Record<string, string>) ?? {}) },
+        dependencies: {
+          ...((pkg.dependencies as Record<string, string>) ?? {}),
+          ...((pkg.devDependencies as Record<string, string>) ?? {}),
+        },
       });
     }
   }
@@ -116,7 +119,10 @@ export function buildDependencyGraph(packages: WorkspacePackage[]): Map<string, 
   const names = new Set(packages.map((p) => p.name));
   const graph = new Map<string, string[]>();
   for (const p of packages) {
-    graph.set(p.name, Object.keys(p.dependencies).filter((d) => names.has(d)));
+    graph.set(
+      p.name,
+      Object.keys(p.dependencies).filter((d) => names.has(d)),
+    );
   }
   return graph;
 }
@@ -133,7 +139,10 @@ export function topologicalSort(graph: Map<string, string[]>): {
   for (const node of graph.keys()) indegree.set(node, 0);
   for (const deps of graph.values()) for (const d of deps) indegree.set(d, (indegree.get(d) ?? 0) + 1);
 
-  const queue = [...indegree.entries()].filter(([, n]) => n === 0).map(([n]) => n).sort();
+  const queue = [...indegree.entries()]
+    .filter(([, n]) => n === 0)
+    .map(([n]) => n)
+    .sort();
   const order: string[] = [];
   const remaining = new Set(graph.keys());
 

@@ -22,10 +22,7 @@ const REGISTRY: Record<FrameworkName, () => FrameworkAdapter> = {
  * Resolve the active framework list for a project.
  * Explicit config wins over auto-detection; 'auto' reads package.json.
  */
-export function resolveFrameworks(
-  pkg: PackageJSON,
-  configured: ResolvedConfig['framework'],
-): FrameworkName[] {
+export function resolveFrameworks(pkg: PackageJSON, configured: ResolvedConfig['framework']): FrameworkName[] {
   if (configured !== 'auto') return configured;
   const detected = detectFrameworks(pkg);
   if (detected.length === 0) {

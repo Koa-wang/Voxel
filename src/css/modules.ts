@@ -11,11 +11,7 @@ export interface CssModulesTransform {
  * Compile a CSS Modules file and return the scoped CSS plus the class-name
  * mapping that gets exposed as a JS default export.
  */
-export function transformCssModules(
-  code: string,
-  filename: string,
-  config: ResolvedConfig,
-): CssModulesTransform {
+export function transformCssModules(code: string, filename: string, config: ResolvedConfig): CssModulesTransform {
   const result = processCss(code, {
     filename,
     minify: false, // final minification happens post-build
@@ -24,10 +20,7 @@ export function transformCssModules(
   });
 
   const exports: Record<string, string> = {};
-  const raw = (result.exports ?? {}) as Record<
-    string,
-    { name?: string; isReferenced?: boolean; composes?: unknown }
-  >;
+  const raw = (result.exports ?? {}) as Record<string, { name?: string; isReferenced?: boolean; composes?: unknown }>;
   for (const [local, value] of Object.entries(raw)) {
     exports[local] = typeof value === 'string' ? value : (value.name ?? local);
   }

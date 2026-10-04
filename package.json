@@ -29,6 +29,11 @@
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsx src/cli.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "verify:templates": "node scripts/verify-templates.mjs",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
@@ -53,14 +58,21 @@
     "http-proxy-middleware": "^3.0.0",
     "lightningcss": "^1.24.1",
     "picocolors": "^1.0.0",
+    "selfsigned": "^5.5.0",
     "shiki": "^1.2.0",
     "ws": "^8.17.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^20.12.0",
+    "@types/selfsigned": "^2.1.0",
     "@types/ws": "^8.5.10",
+    "eslint": "^10.11.0",
+    "prettier": "^3.9.9",
     "tsx": "^4.7.0",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^8.71.0",
+    "vitest": "^5.0.3"
   },
   "peerDependencies": {
     "react": ">=18",
@@ -69,9 +81,17 @@
     "vue": ">=3.3"
   },
   "peerDependenciesMeta": {
-    "react": { "optional": true },
-    "react-dom": { "optional": true },
-    "solid-js": { "optional": true },
-    "vue": { "optional": true }
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    },
+    "solid-js": {
+      "optional": true
+    },
+    "vue": {
+      "optional": true
+    }
   }
 }

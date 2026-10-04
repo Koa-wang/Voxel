@@ -1,14 +1,8 @@
-import { access, readFile } from 'node:fs/promises';
+import { access, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { isAbsolute, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import * as esbuild from 'esbuild';
-import type {
-  CliOptions,
-  FrameworkName,
-  Mode,
-  ResolvedConfig,
-  UserConfig,
-} from '../types.js';
+import type { CliOptions, FrameworkName, Mode, ResolvedConfig, UserConfig } from '../types.js';
 import { logger } from './logger.js';
 
 export const CONFIG_FILES = [
@@ -77,9 +71,19 @@ export async function loadConfig(cwd: string): Promise<UserConfig | undefined> {
         external: ['unibits'],
       });
       const code = bundled.outputFiles[0].text;
-      const url = `data:text/javascript;base64,${Buffer.from(code).toString('base64')}`;
-      const mod = (await import(url)) as { default?: UserConfig };
-      return mod.default ?? {};
+      // Write the bundle into a temp file inside the project so that a bare
+      // `import … from 'unibits'` in the config resolves against the project's
+      // node_modules (a data: URL cannot resolve bare specifiers).
+      const tmpDir = resolve(cwd, 'node_modules/.cache/unibits');
+      await mkdir(tmpDir, { recursive: true });
+      const tmpFile = resolve(tmpDir, `unibits.config.${Date.now()}.mjs`);
+      await writeFile(tmpFile, code, 'utf8');
+      try {
+        const mod = (await import(pathToFileURL(tmpFile).href)) as { default?: UserConfig };
+        return mod.default ?? {};
+      } finally {
+        await rm(tmpFile, { force: true });
+      }
     }
     // .js/.mjs/.cjs — import directly (cjs is handled via Node interop)
     const mod = (await import(`${pathToFileURL(path).href}?t=${Date.now()}`)) as {
@@ -108,22 +112,29 @@ export async function detectEntry(cwd: string): Promise<string> {
   for (const c of candidates) {
     if (await fileExists(resolve(cwd, c))) return c;
   }
-  throw new Error(
-    'No entry point found. Create src/index.html or src/index.ts, or pass an entry explicitly.',
-  );
+  throw new Error('No entry point found. Create src/index.html or src/index.ts, or pass an entry explicitly.');
 }
 
-function normalizeFramework(value: UserConfig['framework'], cli?: CliOptions['framework']): ResolvedConfig['framework'] {
+function normalizeFramework(
+  value: UserConfig['framework'],
+  cli?: CliOptions['framework'],
+): ResolvedConfig['framework'] {
   const chosen = cli ?? value ?? 'auto';
   if (chosen === 'auto') return 'auto';
   const list = Array.isArray(chosen) ? chosen : [chosen];
   return [...new Set(list)];
 }
 
-export async function resolveConfig(
-  cli: CliOptions = {},
-  cwd: string = process.cwd(),
-): Promise<ResolvedConfig> {
+/** Normalize a user-provided base path to always start and end with '/'. */
+export function normalizeBase(value: string | undefined): string {
+  if (!value || value === '/') return '/';
+  let base = value;
+  if (!base.startsWith('/')) base = '/' + base;
+  if (!base.endsWith('/')) base = base + '/';
+  return base;
+}
+
+export async function resolveConfig(cli: CliOptions = {}, cwd: string = process.cwd()): Promise<ResolvedConfig> {
   const user = (await loadConfig(cwd)) ?? {};
   const mode: Mode = cli.lib || process.env.NODE_ENV === 'production' ? 'production' : 'development';
 
@@ -131,7 +142,7 @@ export async function resolveConfig(
     ? resolve(cwd, cli.entry)
     : user.entry
       ? resolve(cwd, user.entry)
-      : await detectEntry(cwd);
+      : resolve(cwd, await detectEntry(cwd));
 
   const outDir = cli.outDir ? resolve(cwd, cli.outDir) : resolve(cwd, user.outDir ?? 'dist');
 
@@ -161,6 +172,8 @@ export async function resolveConfig(
     cacheDir: resolve(cwd, user.cacheDir ?? '.cache'),
     watchDirs: (user.watchDirs ?? []).map((d) => (isAbsolute(d) ? d : resolve(cwd, d))),
     host: cli.host ?? 'localhost',
-    https: cli.https ?? false,
+    https: cli.https ?? user.https ?? false,
+    open: cli.open ?? user.open ?? false,
+    base: normalizeBase(user.base),
   };
 }

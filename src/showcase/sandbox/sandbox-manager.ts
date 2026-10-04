@@ -2,15 +2,18 @@ import { VUE_RUNTIME } from '../runtime/vue-runtime.js';
 import { REACT_RUNTIME } from '../runtime/react-runtime.js';
 import { SOLID_RUNTIME } from '../runtime/solid-runtime.js';
 
-const IMPORT_MAP = {
-  vue: '/__unibits/pkg/vue',
-  react: '/__unibits/pkg/react',
-  'react/jsx-runtime': '/__unibits/pkg/react-jsx-runtime',
-  'react-dom/client': '/__unibits/pkg/react-dom-client',
-  'solid-js': '/__unibits/pkg/solid-js',
-  'solid-js/web': '/__unibits/pkg/solid-js-web',
-  'solid-js/store': '/__unibits/pkg/solid-js-store',
-};
+function buildImportMap(base = '/'): Record<string, string> {
+  const prefix = base + '__unibits/pkg/';
+  return {
+    vue: prefix + 'vue',
+    react: prefix + 'react',
+    'react/jsx-runtime': prefix + 'react-jsx-runtime',
+    'react-dom/client': prefix + 'react-dom-client',
+    'solid-js': prefix + 'solid-js',
+    'solid-js/web': prefix + 'solid-js-web',
+    'solid-js/store': prefix + 'solid-js-store',
+  };
+}
 
 /**
  * F1 — iframe sandbox template.
@@ -18,7 +21,8 @@ const IMPORT_MAP = {
  * The import map resolves framework bare specifiers to local ESM bundles
  * served by the showcase server.
  */
-export function sandboxHtml(): string {
+export function sandboxHtml(base = '/'): string {
+  const IMPORT_MAP = buildImportMap(base);
   return `<!doctype html>
 <html>
 <head>

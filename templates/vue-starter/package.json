@@ -11,6 +11,6 @@
     "vue": "^3.4.0"
   },
   "devDependencies": {
-    "unibits": "latest"
+    "unibits": "workspace:*"
   }
 }

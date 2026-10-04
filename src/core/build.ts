@@ -213,7 +213,9 @@ async function buildLibrary(
   logger.info('building CJS → dist/index.js');
   await esbuild.build(createEsbuildOptions({ ...base, outfile: resolve(config.outDir, 'index.js'), format: 'cjs' }));
   logger.info('building ESM → dist/index.module.js');
-  await esbuild.build(createEsbuildOptions({ ...base, outfile: resolve(config.outDir, 'index.module.js'), format: 'esm' }));
+  await esbuild.build(
+    createEsbuildOptions({ ...base, outfile: resolve(config.outDir, 'index.module.js'), format: 'esm' }),
+  );
   logger.info('emitting type declarations → dist/index.d.ts');
   await runTscDeclarations(config);
 }
@@ -251,7 +253,9 @@ export async function build(cli: CliOptions = {}, cwd: string = process.cwd()): 
   const adapters: FrameworkAdapter[] = createAdapters(frameworks);
 
   if (frameworks.length === 0) {
-    logger.warn('No framework detected — building as plain JS/TS. Install vue / react / solid-js to enable framework features.');
+    logger.warn(
+      'No framework detected — building as plain JS/TS. Install vue / react / solid-js to enable framework features.',
+    );
   }
 
   const styles = new Map<string, string>();
@@ -287,8 +291,8 @@ export async function build(cli: CliOptions = {}, cwd: string = process.cwd()): 
   if (html) {
     const outName = basename(jsEntry).replace(/\.(ts|tsx|js|jsx|mjs|cjs)$/, '');
     let content = html.content;
-    content = content.replace(html.src, `/${outName}.js`);
-    content = content.replace('</head>', `<link rel="stylesheet" href="/${outName}.css">\n</head>`);
+    content = content.replace(html.src, `${config.base}${outName}.js`);
+    content = content.replace('</head>', `<link rel="stylesheet" href="${config.base}${outName}.css">\n</head>`);
     await writeFile(resolve(config.outDir, basename(config.entry)), content, 'utf8');
   }
 
@@ -307,5 +311,9 @@ export async function build(cli: CliOptions = {}, cwd: string = process.cwd()): 
   await manager.writeEmitted(ctx, config);
 
   logger.success(`built in ${Date.now() - start}ms → ${relative(cwd, config.outDir)}`);
-  return { outDir: config.outDir, outputFiles: Object.keys(result.metafile?.outputs ?? {}), duration: Date.now() - start };
+  return {
+    outDir: config.outDir,
+    outputFiles: Object.keys(result.metafile?.outputs ?? {}),
+    duration: Date.now() - start,
+  };
 }

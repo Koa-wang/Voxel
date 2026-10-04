@@ -4,8 +4,13 @@ import type { ShowcaseConfig } from '../types.js';
  * The showcase SPA. A dependency-free single page that fetches the component
  * manifest, compiles snippets via the server endpoint and renders them inside
  * an isolated iframe sandbox.
+ *
+ * @param base  Public base path (normalized, always ends with '/').
+ * @param staticMode  When true the page uses pre-compiled component code from
+ *                    the manifest and never calls the compile endpoint, so the
+ *                    output can be deployed to any static host.
  */
-export function showcaseAppHtml(config: ShowcaseConfig): string {
+export function showcaseAppHtml(config: ShowcaseConfig, base = '/', staticMode = false): string {
   const primary = config.theme?.primaryColor ?? '#00ffa3';
   const title = config.title ?? 'UniBits Components';
   const description = config.description ?? '';
@@ -70,12 +75,19 @@ a{color:var(--primary)}.app{display:flex;height:100vh}
 (() => {
   const $ = (s, r=document) => r.querySelector(s);
   const primary = ${JSON.stringify(primary)};
+  const BASE = ${JSON.stringify(base)};
+  const STATIC = ${JSON.stringify(staticMode)};
   let components = [];
   let current = null;
   let currentFramework = 'vue';
 
+  function resolvePath(p) {
+    if (p.startsWith('http')) return p;
+    return BASE + p.replace(/^\//, '');
+  }
+
   async function api(path, opts) {
-    const res = await fetch(path, opts);
+    const res = await fetch(resolvePath(path), opts);
     if (!res.ok) throw new Error(await res.text());
     return res.json();
   }
@@ -130,7 +142,7 @@ a{color:var(--primary)}.app{display:flex;height:100vh}
     load();
   }
 
-  const sandboxHtml = () => fetch('/__unibits/sandbox').then(r => r.text());
+  const sandboxHtml = () => fetch(resolvePath('/__unibits/sandbox.html')).then(r => r.text());
 
   async function load() {
     document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('active', b.dataset.f === currentFramework));
@@ -173,10 +185,25 @@ a{color:var(--primary)}.app{display:flex;height:100vh}
 
   async function compileAndRender(code, props = {}) {
     try {
-      const compiled = await api('/__unibits/compile', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ code, framework: currentFramework }) });
+      let compiledCode;
+      if (STATIC) {
+        // Static deployment: no compile endpoint exists. Use the pre-compiled
+        // code embedded in the manifest when the source is untouched; editing
+        // requires the dev server.
+        const src = current.sources.find(s => s.framework === currentFramework);
+        if (src && src.code === code && src.compiled) {
+          compiledCode = src.compiled;
+        } else {
+          toast('Live editing needs the dev server — run: unibits showcase');
+          return;
+        }
+      } else {
+        const compiled = await api(BASE + '__unibits/compile', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ code, framework: currentFramework }) });
+        compiledCode = compiled.code;
+      }
       const frame = $('#frame');
       frame.srcdoc = await sandboxHtml();
-      frame.onload = () => frame.contentWindow.postMessage({ source: 'unibits-showcase', type: 'render', framework: currentFramework, code: compiled.code, props }, '*');
+      frame.onload = () => frame.contentWindow.postMessage({ source: 'unibits-showcase', type: 'render', framework: currentFramework, code: compiledCode, props }, '*');
     } catch (e) { toast('✖ ' + e.message); }
   }
 

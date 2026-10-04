@@ -15,16 +15,16 @@
 
 ## 技术栈
 
-| 模块 | 选型 |
-| --- | --- |
-| 构建引擎 | esbuild（Rust 内核，快） |
-| JS 编译 | esbuild + SWC 风格自动 runtime |
-| CSS 引擎 | Lightning CSS（解析 / 压缩 / autoprefixer） |
-| Vue 编译 | `@vue/compiler-sfc` |
+| 模块       | 选型                                          |
+| ---------- | --------------------------------------------- |
+| 构建引擎   | esbuild（Rust 内核，快）                      |
+| JS 编译    | esbuild + SWC 风格自动 runtime                |
+| CSS 引擎   | Lightning CSS（解析 / 压缩 / autoprefixer）   |
+| Vue 编译   | `@vue/compiler-sfc`                           |
 | React 编译 | esbuild `jsx: automatic`（React 17+ runtime） |
-| Solid 编译 | `babel-preset-solid` |
-| Dev Server | 原生 Node HTTP + `ws` |
-| CLI | Commander + `@clack/prompts` |
+| Solid 编译 | `babel-preset-solid`                          |
+| Dev Server | 原生 Node HTTP + `ws`                         |
+| CLI        | Commander + `@clack/prompts`                  |
 
 ## 快速开始
 
@@ -177,10 +177,10 @@ interface Plugin {
   name: string;
   frameworks?: ('vue' | 'react' | 'solid')[];
   order?: number;
-  setup?(ctx): Promise<void>;        // 并行
-  beforeBuild?(ctx): Promise<void>;  // 串行（按 order）
+  setup?(ctx): Promise<void>; // 并行
+  beforeBuild?(ctx): Promise<void>; // 串行（按 order）
   transform?(asset): Promise<Asset>; // 逐资源管线
-  afterBuild?(ctx): Promise<void>;   // 并行
+  afterBuild?(ctx): Promise<void>; // 并行
 }
 ```
 

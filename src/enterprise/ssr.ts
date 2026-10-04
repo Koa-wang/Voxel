@@ -128,7 +128,7 @@ function findFirstJs(dir: string): string | null {
   try {
     const entries = readdirSync(dir);
     const js = entries.filter((e) => e.endsWith('.js') && !e.endsWith('.map'));
-    return js.length === 1 ? js[0] : js.find((e) => e.startsWith('entry-server') || e.startsWith('server')) ?? null;
+    return js.length === 1 ? js[0] : (js.find((e) => e.startsWith('entry-server') || e.startsWith('server')) ?? null);
   } catch {
     return null;
   }

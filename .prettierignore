@@ -1,0 +1,6 @@
+node_modules
+dist
+.cache
+templates/*/dist
+templates/*/node_modules
+pnpm-lock.yaml

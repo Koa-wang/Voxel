@@ -17,14 +17,15 @@ import { logger } from '../core/logger.js';
 export class PluginManager {
   private plugins: Plugin[];
 
-  constructor(plugins: Plugin[], private frameworks: FrameworkName[]) {
+  constructor(
+    plugins: Plugin[],
+    private frameworks: FrameworkName[],
+  ) {
     this.plugins = plugins;
   }
 
   private scoped(): Plugin[] {
-    return this.plugins.filter(
-      (p) => !p.frameworks || p.frameworks.some((f) => this.frameworks.includes(f)),
-    );
+    return this.plugins.filter((p) => !p.frameworks || p.frameworks.some((f) => this.frameworks.includes(f)));
   }
 
   async setup(ctx: PluginContext): Promise<void> {
@@ -64,7 +65,10 @@ export class PluginManager {
   }
 }
 
-export function createManager(config: ResolvedConfig, frameworks: FrameworkName[]): {
+export function createManager(
+  config: ResolvedConfig,
+  frameworks: FrameworkName[],
+): {
   manager: PluginManager;
   ctx: PluginContext;
 } {

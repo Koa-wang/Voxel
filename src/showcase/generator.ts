@@ -42,10 +42,7 @@ async function exists(path: string): Promise<boolean> {
  *   index.solid.tsx → Solid source
  *   meta.json       → name / category / description / props schema / tags
  */
-export async function scanComponents(
-  componentsDir: string,
-  fallbackCategory = 'Components',
-): Promise<ComponentMeta[]> {
+export async function scanComponents(componentsDir: string, fallbackCategory = 'Components'): Promise<ComponentMeta[]> {
   const metas: ComponentMeta[] = [];
   let entries;
   try {
@@ -58,9 +55,7 @@ export async function scanComponents(
     if (!entry.isDirectory()) continue;
     const dir = resolve(componentsDir, entry.name);
     const metaPath = join(dir, 'meta.json');
-    const meta = (await exists(metaPath))
-      ? JSON.parse(await readFile(metaPath, 'utf8'))
-      : {};
+    const meta = (await exists(metaPath)) ? JSON.parse(await readFile(metaPath, 'utf8')) : {};
 
     const sources: ComponentSource[] = [];
     const files = (await readdir(dir)).filter((f) => frameworkForFile(f));

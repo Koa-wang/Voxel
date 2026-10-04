@@ -14,14 +14,26 @@ export const HMR_CLIENT = `(() => {
       console.log('[unibits] hot channel ready (' + (msg.framework || 'multi') + ')');
     } else if (msg.type === 'full-reload') {
       location.reload();
-    } else if (msg.type === 'update') {
-      // Hot update: attempt to re-import changed modules; the simplest correct
-      // strategy for a bundled dev server is a fast reload.
-      if (msg.files && msg.files.length && typeof import.meta.hot === 'undefined') {
-        location.reload();
-      } else {
-        location.reload();
+    } else if (msg.type === 'css-update') {
+      // Style-only change: swap the affected <link> tags in place so the page
+      // state (scroll, inputs, component state) survives the update.
+      const files = msg.files || [];
+      const links = Array.from(document.querySelectorAll('link[rel="stylesheet"]'));
+      let matched = false;
+      for (const link of links) {
+        const href = link.getAttribute('href');
+        if (!href) continue;
+        const path = href.split('?')[0];
+        if (files.indexOf(path) === -1) continue;
+        const clone = link.cloneNode();
+        clone.href = path + '?t=' + Date.now();
+        clone.onload = () => link.remove();
+        link.parentNode.insertBefore(clone, link.nextSibling);
+        matched = true;
       }
+      if (!matched) location.reload();
+    } else if (msg.type === 'update') {
+      location.reload();
     } else if (msg.type === 'error') {
       window.__unibits_show_error && window.__unibits_show_error(msg);
     }

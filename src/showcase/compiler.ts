@@ -9,10 +9,7 @@ import { compileSolidJsx } from '../adapters/solid.js';
  * sandbox iframe (which preloads the matching framework runtime via an import
  * map).
  */
-export async function compileShowcaseCode(
-  code: string,
-  framework: FrameworkName,
-): Promise<string> {
+export async function compileShowcaseCode(code: string, framework: FrameworkName): Promise<string> {
   switch (framework) {
     case 'vue':
       return compileVueSfc('Component.vue', code).js;

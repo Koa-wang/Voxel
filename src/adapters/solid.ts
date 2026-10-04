@@ -14,10 +14,7 @@ const SOLID_IMPORT_RE = /from\s+['"](solid-js|solid-js\/web|solid-js\/store|soli
  * insert / delegateEvents), not a virtual DOM — so it must never pass through
  * esbuild's React-oriented JSX transform.
  */
-export async function compileSolidJsx(
-  filename: string,
-  code: string,
-): Promise<string> {
+export async function compileSolidJsx(filename: string, code: string): Promise<string> {
   const result = await babel.transformAsync(code, {
     filename,
     babelrc: false,
@@ -58,7 +55,10 @@ export class SolidAdapter implements FrameworkAdapter {
     return !!(pkg.dependencies?.['solid-js'] || pkg.devDependencies?.['solid-js']);
   }
 
-  getTransformPlugins(_config: import('../types.js').ResolvedConfig, frameworks: import('../types.js').FrameworkName[]): TransformPlugin[] {
+  getTransformPlugins(
+    _config: import('../types.js').ResolvedConfig,
+    frameworks: import('../types.js').FrameworkName[],
+  ): TransformPlugin[] {
     return [new SolidTransformPlugin(frameworks.includes('react'))];
   }
 
@@ -92,15 +92,12 @@ export class SolidAdapter implements FrameworkAdapter {
       },
       mount(el: HTMLElement, compiledCode: string, props: Record<string, unknown>): () => void {
         const sandbox = (globalThis as Record<string, unknown>).__unibits_sandbox as
-          | { mountSolid(el: HTMLElement, code: string, props: unknown): () => void }
-          | undefined;
+          { mountSolid(el: HTMLElement, code: string, props: unknown): () => void } | undefined;
         if (!sandbox?.mountSolid) throw new Error('Solid sandbox runtime not initialized');
         return sandbox.mountSolid(el, compiledCode, props);
       },
       unmount(): void {
-        const sandbox = (globalThis as Record<string, unknown>).__unibits_sandbox as
-          | { unmountAll(): void }
-          | undefined;
+        const sandbox = (globalThis as Record<string, unknown>).__unibits_sandbox as { unmountAll(): void } | undefined;
         sandbox?.unmountAll();
       },
     };

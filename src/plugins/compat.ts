@@ -11,7 +11,10 @@ import type { Plugin } from './context.js';
 
 type ViteLikePlugin = {
   name?: string;
-  transform?(code: string, id: string): { code: string; map?: unknown } | null | Promise<{ code: string; map?: unknown } | null>;
+  transform?(
+    code: string,
+    id: string,
+  ): { code: string; map?: unknown } | null | Promise<{ code: string; map?: unknown } | null>;
   configResolved?(config: unknown): void;
   [key: string]: unknown;
 };
@@ -33,7 +36,10 @@ export function adaptVitePlugin(plugin: ViteLikePlugin): Plugin {
 
 type RollupLikePlugin = {
   name?: string;
-  transform?(code: string, id: string): { code: string; map?: unknown } | null | Promise<{ code: string; map?: unknown } | null>;
+  transform?(
+    code: string,
+    id: string,
+  ): { code: string; map?: unknown } | null | Promise<{ code: string; map?: unknown } | null>;
   [key: string]: unknown;
 };
 

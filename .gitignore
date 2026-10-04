@@ -3,3 +3,5 @@ dist/
 .cache/
 *.log
 .DS_Store
+templates/*/dist/
+templates/*/node_modules/

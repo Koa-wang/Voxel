@@ -28,18 +28,28 @@ export async function run(): Promise<void> {
     .option('-p, --port <port>', 'dev server port', (v) => parseInt(v, 10))
     .option('--framework <frameworks>', 'force framework: vue | react | solid | vue,react')
     .option('--host <host>', 'bind host')
-    .option('--https', 'enable HTTPS')
-    .action(async (entry, opts: { port?: number; framework?: string; host?: string; https?: boolean }) => {
-      const cwd = process.cwd();
-      const pkg = await readPackageJson(cwd);
-      const detected = detectFrameworks(pkg);
-      if (detected.length === 0 && !opts.framework) {
-        logger.warn('No framework detected in package.json. Install one and retry:');
-        logger.raw('  npm install vue            # or react react-dom, or solid-js');
-      }
-      logger.info(`frameworks: ${opts.framework ?? (describeFrameworks(detected) || 'none')}`);
-      await dev({ entry, port: opts.port, framework: parseFramework(opts.framework), host: opts.host, https: opts.https });
-    });
+    .option('--https', 'enable HTTPS (self-signed certificate)')
+    .option('--open', 'open the browser automatically')
+    .action(
+      async (entry, opts: { port?: number; framework?: string; host?: string; https?: boolean; open?: boolean }) => {
+        const cwd = process.cwd();
+        const pkg = await readPackageJson(cwd);
+        const detected = detectFrameworks(pkg);
+        if (detected.length === 0 && !opts.framework) {
+          logger.warn('No framework detected in package.json. Install one and retry:');
+          logger.raw('  npm install vue            # or react react-dom, or solid-js');
+        }
+        logger.info(`frameworks: ${opts.framework ?? (describeFrameworks(detected) || 'none')}`);
+        await dev({
+          entry,
+          port: opts.port,
+          framework: parseFramework(opts.framework),
+          host: opts.host,
+          https: opts.https,
+          open: opts.open,
+        });
+      },
+    );
 
   program
     .command('build')
@@ -50,24 +60,42 @@ export async function run(): Promise<void> {
     .option('--analyze', 'emit a bundle analysis report')
     .option('--no-cache', 'disable compilation cache')
     .option('-o, --outDir <dir>', 'output directory')
-    .action(async (entry, opts: { lib?: boolean; ssr?: boolean; routes?: string; analyze?: boolean; cache?: boolean; outDir?: string }) => {
-      const routes = opts.routes ? opts.routes.split(',').map((r) => r.trim()).filter(Boolean) : [];
-      if (opts.lib) {
-        await buildLibraryMode({ entry, outDir: opts.outDir, noCache: opts.cache === false });
-      } else {
-        await build({ entry, outDir: opts.outDir, ssr: opts.ssr, routes, analyze: opts.analyze, noCache: opts.cache === false });
-      }
-    });
+    .action(
+      async (
+        entry,
+        opts: { lib?: boolean; ssr?: boolean; routes?: string; analyze?: boolean; cache?: boolean; outDir?: string },
+      ) => {
+        const routes = opts.routes
+          ? opts.routes
+              .split(',')
+              .map((r) => r.trim())
+              .filter(Boolean)
+          : [];
+        if (opts.lib) {
+          await buildLibraryMode({ entry, outDir: opts.outDir, noCache: opts.cache === false });
+        } else {
+          await build({
+            entry,
+            outDir: opts.outDir,
+            ssr: opts.ssr,
+            routes,
+            analyze: opts.analyze,
+            noCache: opts.cache === false,
+          });
+        }
+      },
+    );
 
   program
     .command('showcase')
     .argument('[action]', 'build | generate | (serve by default)')
     .option('-p, --port <port>', 'port', (v) => parseInt(v, 10))
     .option('-o, --outDir <dir>', 'output directory (for build/generate)')
-    .action(async (action, opts: { port?: number; outDir?: string }) => {
+    .option('--open', 'open the browser automatically')
+    .action(async (action, opts: { port?: number; outDir?: string; open?: boolean }) => {
       const config = await resolveConfig({ entry: '.', outDir: opts.outDir });
       const buildOnly = action === 'build' || action === 'generate';
-      await serveShowcase(config, opts.port ?? config.port, buildOnly);
+      await serveShowcase(config, opts.port ?? config.port, buildOnly, opts.open ?? config.open);
     });
 
   program
