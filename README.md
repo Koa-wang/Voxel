@@ -203,4 +203,4 @@ pnpm typecheck  # tsc --noEmit
 
 ## License
 
-MIT
+[MIT](https://github.com/Koa-wang/Voxel/blob/main/LICENSE)
